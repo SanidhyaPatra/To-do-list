@@ -1,36 +1,62 @@
-const express = require("express");
-const bodyParser = require("body-parser");
+window.addEventListener('load', () => {
+	const form = document.querySelector("#new-task-form");
+	const input = document.querySelector("#new-task-input");
+	const list_el = document.querySelector("#tasks");
 
-const app = express();
+	form.addEventListener('submit', (e) => {
+		e.preventDefault();
 
-var items = [];
+		const task = input.value;
 
-app.set("view engine", "ejs"); 
-app.use(bodyParser.urlencoded({extended : true}));
-app.use(express.static("public"));
+		const task_el = document.createElement('div');
+		task_el.classList.add('task');
 
-app.get('/', function(req, res){
-    var today = new Date();
+		const task_content_el = document.createElement('div');
+		task_content_el.classList.add('content');
 
-    var options = {
-        weekday : "long",
-        day : "numeric",
-        month : "long"
-    };
+		task_el.appendChild(task_content_el);
 
-    var day = today.toLocaleDateString("en-US", options);
+		const task_input_el = document.createElement('input');
+		task_input_el.classList.add('text');
+		task_input_el.type = 'text';
+		task_input_el.value = task;
+		task_input_el.setAttribute('readonly', 'readonly');
 
-    res.render("list", {kindOfDay: day, newListItems: items});
+		task_content_el.appendChild(task_input_el);
 
-});
+		const task_actions_el = document.createElement('div');
+		task_actions_el.classList.add('actions');
+		
+		const task_edit_el = document.createElement('button');
+		task_edit_el.classList.add('edit');
+		task_edit_el.innerText = 'Edit';
 
-app.post("/", function(req, res){
-    var item = req.body.newItem;
-    items.push(item);
-    res.redirect("/");
-});
+		const task_delete_el = document.createElement('button');
+		task_delete_el.classList.add('delete');
+		task_delete_el.innerText = 'Delete';
 
+		task_actions_el.appendChild(task_edit_el);
+		task_actions_el.appendChild(task_delete_el);
 
-app.listen(3000, function(){
-    console.log("Server running at port 3000");
+		task_el.appendChild(task_actions_el);
+
+		list_el.appendChild(task_el);
+
+		input.value = '';
+
+		task_edit_el.addEventListener('click', (e) => {
+			if (task_edit_el.innerText.toLowerCase() == "edit") {
+				task_edit_el.innerText = "Save";
+				task_input_el.removeAttribute("readonly");
+				task_input_el.focus();
+			} else {
+				task_edit_el.innerText = "Edit";
+				task_input_el.setAttribute("readonly", "readonly");
+			}
+		});
+
+		task_delete_el.addEventListener('click', (e) => {
+			list_el.removeChild(task_el);
+		});
+	});
 });
